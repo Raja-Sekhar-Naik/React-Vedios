@@ -1,0 +1,254 @@
+1. Create a component UseEffect1 under hooks as shown:
+	import React, { useState, useEffect } from "react";
+
+	export default function UseEffect1() {
+	  return (
+		<React.Fragment>
+		  <h3>useEffect Demo</h3>
+		</React.Fragment>
+	  );
+	}
+
+
+2. Update HooksWrapper as shown:
+	import React from "react";
+	import UseEffect1 from "./UseEffect1";
+	import UseState1 from "./UseState1";
+
+	export default class HooksWrapper extends React.Component {
+	  render() {
+		return (
+		  <React.Fragment>
+			<h2>React Hooks</h2>
+			<article className="m-1 border border-secondary rounded">
+			  {/*<UseState1 /> */}
+			  <UseEffect1 />
+			</article>
+		  </React.Fragment>
+		);
+	  }
+	}
+	
+	
+useEffect()
+++++++++++
+The useEffect Hook allows you to perform side effects in your components. Some examples of side effects are: fetching data, directly updating the DOM, and timers. Thus, in a way, it mimicks LC methods for functional components.
+
+useEffect accepts two arguments
+	useEffect(<function>, <dependency>)	//second argument is optional
+
+
+Syntax 1: without dependency
+----------------------------
+	useEffect(()=>{
+		//executable code
+	})
+	
+Runs after first render and every time the component gets updated. This is similar to componentDidMount + componentDidUpdate
+
+3. Update UseEffect1 as shown:
+	import React, { useState, useEffect } from "react";
+
+	export default function UseEffect1() {
+	  // initialize timer
+	  const [secondsElapsed, setSecondsElapsed] = useState(0);
+
+	  useEffect(() => {
+		let timer = setTimeout(() => {
+		  setSecondsElapsed((secondsElapsed) => secondsElapsed + 1);
+		}, 1000);
+	  });
+	  /**
+	   * without dependencies, it is similar to combined effect of
+	   * componentDidMount and componentDidUpdate
+	   * i.e., it will run once after render, and for every change of state
+	   */
+
+	  return (
+		<React.Fragment>
+		  <h3>useEffect Demo</h3>
+		  <h4>Timer with useEffect</h4>
+		  <p className="lead">
+			You have spent {secondsElapsed} seconds on this page.
+		  </p>
+		</React.Fragment>
+	  );
+	}
+
+
+4. Remember that if you have made any subscriptions/timeouts in componentDidMount, you need to tear down during componentWillUnmount? This effect can be achieved by including a return function at the end of the useEffect Hook. Update UseEffect1 as shown:
+	import React, { useState, useEffect } from "react";
+
+	export default function UseEffect1() {
+	  // initialize timer
+	  const [secondsElapsed, setSecondsElapsed] = useState(0);
+
+	  useEffect(() => {
+		let timer = setTimeout(() => {
+		  setSecondsElapsed((secondsElapsed) => secondsElapsed + 1);
+		}, 1000);
+		// tear down/ dispose effects that are not required
+		return () => clearTimeout(timer); // this is why named 'timer' variable
+	  });
+	  /**
+	   * without dependencies, it is similar to combined effect of
+	   * componentDidMount and componentDidUpdate
+	   * i.e., it will run once after render, and for every change of state
+	   */
+
+	  return (
+		<React.Fragment>
+		  <h3>useEffect Demo</h3>
+		  <h4>Timer with useEffect - No dependency</h4>
+		  <p className="lead">
+			You have spent {secondsElapsed} seconds on this page.
+		  </p>
+		</React.Fragment>
+	  );
+	}
+
+
+
+Syntax 2: with empty dependency array
+-------------------------------------
+	useEffect(()=>{
+		//executable code
+	},[])
+	
+Runs only after the component mounts, that too once. Hence, is equivalent to componentDidMount()
+
+5. Add an empty [] as dependency in useEffect of UseEffect1. Check the output.
+	import React, { useState, useEffect } from "react";
+
+	export default function UseEffect1() {
+	  const [secondsElapsed, setSecondsElapsed] = useState(0);
+
+	  useEffect(() => {
+		let timer = setTimeout(() => {
+		  setSecondsElapsed((secondsElapsed) => secondsElapsed + 1);
+		}, 1000);
+		return () => clearTimeout(timer);
+	  }, []); // empty [] dependency
+	  /**
+	   * with [] dependency, it is similar to componentDidMount
+	   * i.e., it will run once after first render
+	   */
+
+	  return (
+		<React.Fragment>
+		  <h3>useEffect Demo</h3>
+		  <h4>Timer with useEffect - [] dependency</h4>
+		  <p className="lead">
+			You have spent {secondsElapsed} seconds on this page.
+		  </p>
+		</React.Fragment>
+	  );
+	}
+	
+	
+6. Oh if its like componentDidMount, can't you make a WS call with useEffect?
+	import React, { useState, useEffect } from "react";
+	import axios from "axios";
+
+	export default function UseEffect1() {
+	  const [users, setUsers] = useState([]);
+
+	  useEffect(() => {
+		axios.get("https://reqres.in/api/users").then((result) => {
+		  setUsers(result.data.data);
+		});
+	  }, []); // empty [] dependency
+
+	  return (
+		<React.Fragment>
+		  <h3>useEffect Demo</h3>
+		  <h4>WS call with useEffect - [] dependency</h4>
+		  <table className="table table-bordered table-striped">
+			<thead className="thead-dark">
+			  <tr>
+				<th>First Name</th>
+				<th>Last Name</th>
+				<th>Email</th>
+				<th>Avatar</th>
+			  </tr>
+			</thead>
+			<tbody>
+			  {users.map((user) => {
+				return (
+				  <tr key={user.id}>
+					<td>{user.first_name}</td>
+					<td>{user.last_name}</td>
+					<td>{user.email}</td>
+					<td>
+					  <img
+						src={user.avatar}
+						className="img-thumbnail"
+						alt="user avatar"
+					  />
+					</td>
+				  </tr>
+				);
+			  })}
+			</tbody>
+		  </table>
+		</React.Fragment>
+	  );
+	}
+
+
+Syntax 3: with specific dependency
+----------------------------------
+	useEffect(() => {
+		//executable code
+	}, [prop, state]);				
+	
+Runs after first render and each time mentioned dependency value changes
+
+7. Suppose you want run an effect whenever empsalary changes. This can be done with Syntax 3.
+	import React, { useState, useEffect } from "react";
+
+	export default function UseState1() {
+	  const [empname, setName] = useState("Nevil");
+	  const [empsalary, setSalary] = useState(10000);
+
+	  useEffect(() => {
+		console.log("Do something on update of salary");
+	  }, [empsalary]); // <- add the state/prop variable you want to run useEffect for here
+
+	  return (
+		<React.Fragment>
+		  <h3>useState Demo</h3>
+		  <form className="m-2 p-2">
+			<div className="form-group">
+			  <label htmlFor="txtinput">Name: </label>
+			  <input
+				type="text"
+				id="txtinput"
+				name="empname"
+				className="form-control"
+				placeholder="Your name"
+				value={empname}
+				onChange={(event) => setName(event.target.value)}
+			  ></input>
+			</div>
+			<div className="form-group">
+			  <label htmlFor="txtinput">Salary: </label>
+			  <input
+				type="number"
+				id="idinput"
+				name="empsalary"
+				className="form-control"
+				placeholder="Your salary"
+				value={empsalary}
+				onChange={(event) => setSalary(event.target.value)}
+			  ></input>
+			</div>
+		  </form>
+		  <p className="m-2 p-2">
+			<strong>Entered Value:</strong> <br />
+			<em>Name : {empname} </em> <br />
+			<em>Salary : {empsalary} </em> <br />
+		  </p>
+		</React.Fragment>
+	  );
+	}

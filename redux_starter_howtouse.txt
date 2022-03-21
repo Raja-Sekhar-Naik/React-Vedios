@@ -1,0 +1,7 @@
+This is for redux-starter (class components) and redux-starter2(function components with hooks)
+
+1. unzip files to your workspace
+2. open each in Visual studio code
+3. from terminal, execute 
+	npm install
+	

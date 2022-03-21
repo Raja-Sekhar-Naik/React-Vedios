@@ -1,0 +1,7 @@
+This is kitchen sink at the end of Day 4
+
+1. unzip kitchen-sink.zip to your workspace
+2. open in Visual studio code
+3. from terminal, execute 
+	npm install
+	
